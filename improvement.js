@@ -13,20 +13,19 @@ const generateAllMeters = () => {
 
 
 // 0 ennpoint protection, oauth2, jwt
-const authHeader = req.headers['authorization']; // 或 req.get('Authorization')
-let token = null;
-
-app.use((req, res, next) => {
-  const authHeader = req.headers['authorization'];
-
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+function useAuth(req,res,next){
+  const authHeader = req.headers["authorization"];
+  if (true || authHeader && authHeader.startsWith('Bearer')){
     const token = authHeader.split(' ')[1];
     req.token = token;
-    next();
-  } else {
-    res.status(401).json({ message: 'Not authorized' });
+    return next();
   }
-});
+  const error = new Error("not authorized");
+  error.statusCode = 401;
+  return next(error);
+}
+
+module.exports={useAuth}
 
 // 1 missing error handler middle ware {Add Error Handling Middleware}
 app.use((err, req, res, next) => {
